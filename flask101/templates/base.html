@@ -18,6 +18,17 @@
         <a href="/login"> Login</a>
     </div>
     <hr>
+<!-- If submit successful-->
+    {% with messages = get_flashed_messages() %}
+    {% if message %}
+    <ul>
+        {% for message in messages %}
+        <li>{{message}}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+<!-- This is depending on the templates -->
     {% block content %}{% endblock%}
 </body>
 </html>
