@@ -82,6 +82,28 @@ db.init_app(app)
 [參考資料](https://medium.com/seaniap/python-web-flask-flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E8%B3%87%E6%96%99%E5%BA%AB-2a799acdec4c)
 
 ## Q: Flask-Migrate 如何使用？ #124
+`Flask-Migrate`的用途是使用在 flask 和 SQLAlchemy 中，當有需要調整資料庫的時候，不需要全部刪掉、重新`db.create_all`，可以只將 Model 更動過的部分 migrate 到資料庫的 table 中。
+- 先安裝`Flask-Migrate`套件(最新版本4.0.5):
+```
+$ pip install Flask-Migrate
+```
+- 在 python 檔案中匯入套件：
+```python
+from flask_migrate import Migrate
+migrate = Migrate(app, db)
+
+```
+- 接著初始化 migrations 創建更新資料夾
+```
+$ flask db init
+flask db migrate -m "版本控制訊息"
+```
+- 完成資料庫的更新
+```
+flask db upgrade
+```
+成功在 flask 連接 MySQL 建立一個 Users Table! 
+[參考資料](https://github.com/miguelgrinberg/flask-migrate)
 
 ## Q: 如何使用 SQLAlchemy 下 Raw SQL？ #125
 

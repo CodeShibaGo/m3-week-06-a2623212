@@ -1,17 +1,31 @@
 from flask import Flask, render_template, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 from forms import LoginForm
 
 db = SQLAlchemy()
 load_dotenv()
 app = Flask(__name__)
+Migrate(app,db)
 
 app.config['SECRET_KEY'] = 'you-will-never-guess'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:root@localhost:3306/db_name"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:root@localhost:3306/MicroBlogData"
 
 db.init_app(app)
+
+
+class Users(db.Model):
+    __tablename__ = 'users'
+    _id = db.Column('id', db.Integer, primary_key=True)
+    name = db.Column('name', db.String(100))
+    email = db.Column(db.String(100))
+    mobile = db.Column('mobile', db.String(100))
+
+    def __init__(self, name, email, mobile):
+        self.name = name
+        self.email = email
+        self.mobile = mobile
 
 
 @app.route('/')
