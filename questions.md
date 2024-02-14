@@ -29,6 +29,37 @@ deactivate
 ```
 
 ## Q: python-dotenv 如何使用？ #119
+`python-dotenv`可以讀取`.env`的內容，設定環境變數，這樣就不用每執行一次都要重新設定環境變數。
+首先，必須先安裝 python-dotenv 套件：
+```
+(venv) $ pip install python-dotenv
+```
+接著在root目錄新增一個名為`.env`的檔案：
+```
+.
+├── .env
+└── app.py
+```
+
+接著在`app.py`檔案裡 import 套件：
+```python=
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
+```
+最後，因為環境變數也可以儲存私密的資料，例如密碼或驗證資料，所以安全的作法並不適合推到 gitHub 上讓大家存取，所以要講`.env`加到`.gitignore`就不會被 git 追蹤。
+
+[參考資料](https://github.com/theskumar/python-dotenv)
+
+`- 說出 .env 跟 .flaskenv 的差別是？`
+相同點是`.flaskenv` 和`.env`這兩個檔案都是用來儲存環境變數，但是：
+- `.flaskenv`作用於 Flask，而`.env`則是 Python 的通用套件，作用範圍比較廣。
+- `.flaskenv`包含預設的環境變數，如`FLASK_APP`，而`.env`沒有預設的變數。
+- `.flaskenv`可以直接被 Flask 讀取，而`.env`需要在檔案中寫入 import。
+- 用 flask 開發 2 者可以共存，在 flask 的文件中，建議：
+> .flaskenv should be used for** public variables**, such as FLASK_APP, while .env should not be committed to your repository so that it can set **private variables**.
+
+[參考資料](https://flask.palletsprojects.com/en/3.0.x/cli/#environment-variables-from-dotenv)
 
 ## Q: 如何使用 Flask-SQLAlchemy 連接上 MySQL？ #123
 
