@@ -62,6 +62,24 @@ load_dotenv()  # take environment variables from .env.
 [參考資料](https://flask.palletsprojects.com/en/3.0.x/cli/#environment-variables-from-dotenv)
 
 ## Q: 如何使用 Flask-SQLAlchemy 連接上 MySQL？ #123
+Flask 沒有內建資料庫，所以可以自己選擇適合的資料庫來連接，以下是連接上`MySQL`的方法：
+- 首先，使用要使用`Flask-SQLAlchemy`套件。
+```
+(venv) $ pip install flask-sqlalchemy
+```
+- 接著，要在本機環境中安裝 MySQL 資料庫（已經完成）
+- 下一步，安裝`PyMySQL`套件，讓 python 操作 MySQL 的套件。
+```
+$ pip install PyMySQL
+```
+- 完成套件安裝之後，要來設定「配置」 config。
+```
+app.config['SQLALCHEMY_DATABASE_URI'] = mysql://{username}:{username}@localhost:{port}/project
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+```
+運作起來沒有噴錯， 應該就正確了。
+[參考資料](https://medium.com/seaniap/python-web-flask-flask-sqlalchemy%E6%93%8D%E4%BD%9Cmysql%E8%B3%87%E6%96%99%E5%BA%AB-2a799acdec4c)
 
 ## Q: Flask-Migrate 如何使用？ #124
 

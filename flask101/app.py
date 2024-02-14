@@ -1,10 +1,17 @@
 from flask import Flask, render_template, flash, redirect
+from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from forms import LoginForm
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'you-will-never-guess'
+db = SQLAlchemy()
 load_dotenv()
+app = Flask(__name__)
+
+app.config['SECRET_KEY'] = 'you-will-never-guess'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:root@localhost:3306/db_name"
+
+db.init_app(app)
 
 
 @app.route('/')
