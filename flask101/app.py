@@ -14,25 +14,11 @@ app.config['SECRET_KEY'] = 'you-will-never-guess'
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:root@localhost:3306/MicroBlogData"
 
 db.init_app(app)
-
-
-class Users(db.Model):
-    __tablename__ = 'users'
-    _id = db.Column('id', db.Integer, primary_key=True)
-    name = db.Column('name', db.String(100))
-    email = db.Column(db.String(100))
-    mobile = db.Column('mobile', db.String(100))
-
-    def __init__(self, name, email, mobile):
-        self.name = name
-        self.email = email
-        self.mobile = mobile
-
-
-sql = text('select * from users')
+# 用土炮的方式做Table
 with app.app_context():
-    result = db.session.execute(sql)
-    print(result.fetchall())
+    sql = text("""\n  CREATE TABLE members (email VARCHAR(50),
+    first_name VARCHAR(50),last_name VARCHAR(50),passwd VARCHAR(50) )""")
+    db.session.execute(sql)
 
 
 @app.route('/')
