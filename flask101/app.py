@@ -1,9 +1,9 @@
 from flask import Flask, render_template, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from forms import LoginForm
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 load_dotenv()
@@ -12,13 +12,24 @@ Migrate(app, db)
 
 app.config['SECRET_KEY'] = 'you-will-never-guess'
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:root@localhost:3306/MicroBlogData"
-
 db.init_app(app)
-# 用土炮的方式做Table
-with app.app_context():
-    sql = text("""\n  CREATE TABLE members (email VARCHAR(50),
-    first_name VARCHAR(50),last_name VARCHAR(50),passwd VARCHAR(50) )""")
-    db.session.execute(sql)
+
+
+def set_password(password):
+    hash = generate_password_hash(password)
+    print('hash:', hash)
+
+    print('answer1:',check_password_hash(hash, password))
+    print('answer2:',check_password_hash(hash, "Goodpassword"))
+
+
+def set_password_again(password):
+    hash = generate_password_hash(password)
+    print('hash:', hash)
+
+
+set_password("password")
+set_password_again("password")
 
 
 @app.route('/')

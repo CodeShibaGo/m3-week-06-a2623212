@@ -217,3 +217,24 @@ Raw SQL，也可以寫作 native SQL，我將它解釋為 SQL 的原始語法，
 `raw SQL queries`具有提供靈活性、效能最佳化以及使用進階資料庫存取的功能；而`ORM`簡化了常見的資料庫操作，提供物件 mapping 功能，還協助組織程式碼，而且他還可以透過自動處理 input 機制，為資料庫加一道安全層。
 
 ## Q: 什麼是密碼雜湊？如何使用 Python 實現？ #129
+
+- 了解什麼是密碼雜湊:
+它是用來將「不同」長度的輸入，轉換成「相同」長度的輸出，其輸出叫做「雜湊值（hash value）」，他的特性是單向而且不可逆。使用同一個雜湊函數算出來的結果會一樣。
+
+- 如何使用 **Werkzeug 進行密碼雜湊**
+    - **generate_password_hash 的功用是？**
+    它的功用是對傳進來的資料進行雜湊運算，並且回傳一組雜湊密碼，和普通的密碼雜湊不同處是，它經過進一步的加鹽（即隨機產生、長度不固定、每次皆使用不同鹽），所以：**即使傳進去的是一樣的資料，也會產生不同的雜湊密碼**。
+    ```
+    hash = generate_password_hash(password)
+    #回傳值：
+    #第1次 scrypt:32768:8:1$cRKiHLD1wBEVidSf$4592ff6840e8a5e94ed564d6530651ab20b95ca1dd06f701e147cae8e449faa3ef0ee67b87f7be34d86de81573f77ee05c5939aecd2499a0bfe1e4d8e109d92b
+    #第2次scrypt:32768:8:1$MM0uh4Z5RY1dSbgl$a9965dbce5fe224a47da551579b904bd79df3de8005a67ec6ae36ba4b623377015d4fa9d11b5fde5628cd14bfac88eaae62bfdb970378dc3480b8759c4257aa2
+    ```
+   - **check_password_hash 的功用是？**
+    它的功用是接受之前生成的 hash 值以及原始數值，並進行運算匹配，根據匹配驗證結果，回傳布林值。
+  ```
+    print('answer1:',check_password_hash(hash, password))
+    #回傳值：answer1: True
+    print('answer2:',check_password_hash(hash,"Goodpassword"))
+    #回傳值：answer1: False
+   ```
