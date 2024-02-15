@@ -106,6 +106,30 @@ flask db upgrade
 [參考資料](https://github.com/miguelgrinberg/flask-migrate)
 
 ## Q: 如何使用 SQLAlchemy 下 Raw SQL？ #125
+承接上面的內容，在安裝好`SQLAlchemy `的狀態下：
+```python
+from sqlalchemy import text
+sql = text('select * from users')
+with app.app_context():
+    result = db.session.execute(sql)
+    print(result.fetchall())
+```
+其中，`with app.app_context()`要確保在執行這資料庫操作時，flask app 是正在運行的，這是我在錯誤訊息中得到的。查看資料似乎是和 flask 的上下文有關。
+
+`db.session.execute`是原生`SQLAlchemy`用來 Execute a SQL expression construct，會回傳執行結果的物件。可以用`text()`API 來建構一個 SQL 字串。
+
+如果沒有加`fetchall()`結果是：
+```
+<sqlalchemy.engine.cursor.CursorResult object at 0x105084fa0>
+```
+有加`fetchall()`結果是：
+```
+[(1, 'Abby', 'abby@gmail.com', '0933929323'), (2, 'Benny', 'Benny@gmail.com', '0911929323'), (3, 'Cassy', 'cassy@gmail.com', '0911787434')]
+
+```
+>`fetchall()`Fetches all (remaining) cases from the active dataset, or if there are splits, the remaining cases in the current split. If there are no remaining rows, the result is an empty tuple. [Reference 1](https://www.ibm.com/docs/en/spss-statistics/29.0.0?topic=python-fetchall-method) || [Reference 2](https://magazine.techacademy.jp/magazine/47802#ta-toc-2)
+
+[參考資料](https://juejin.cn/s/flask%20sqlalchemy%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%94%9Fsql)
 
 ## Q: 如何用土炮的方式建立 Table？ #126
 

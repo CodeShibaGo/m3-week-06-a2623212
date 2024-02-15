@@ -1,5 +1,6 @@
 from flask import Flask, render_template, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from forms import LoginForm
@@ -7,7 +8,7 @@ from forms import LoginForm
 db = SQLAlchemy()
 load_dotenv()
 app = Flask(__name__)
-Migrate(app,db)
+Migrate(app, db)
 
 app.config['SECRET_KEY'] = 'you-will-never-guess'
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:root@localhost:3306/MicroBlogData"
@@ -26,6 +27,12 @@ class Users(db.Model):
         self.name = name
         self.email = email
         self.mobile = mobile
+
+
+sql = text('select * from users')
+with app.app_context():
+    result = db.session.execute(sql)
+    print(result.fetchall())
 
 
 @app.route('/')
