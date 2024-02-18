@@ -1,11 +1,20 @@
 from flask import render_template, flash, redirect, url_for, request
-from flask_login import current_user, login_user, login_required
-from sqlalchemy import text
-
+from flask_login import current_user, login_user, logout_user, login_required
+from sqlalchemy import select, func
 from app import app, db
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from app.models import User
 from urllib.parse import urlsplit
+from datetime import datetime, timezone
+
+
+@app.before_request
+def before_request():
+    print(current_user)
+    print(current_user.is_authenticated)
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now(timezone.utc)
+        db.session.commit()
 
 
 @app.route('/')
@@ -30,21 +39,26 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
-    print(form.password.data)
     if form.validate_on_submit():
         input_name = form.username.data
-        sql_fine_user = text(f'SELECT * FROM users WHERE username = "{input_name}"')
-        user = db.session.execute(sql_fine_user)
+        user = db.session.scalar(select(User).where(
+            User.username == {input_name}
+        ))
         if user is None or not user.check_password(form.password.data):
             flash('Incorrect username or password')
-            return redirect(url_for('index'))
+            return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-
     return render_template(template_name_or_list='login.html', title='Login', form=form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -57,6 +71,37 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('恭喜，你現在是一名註冊使用者！')
+        flash('Welcome to register a User!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    query = select(User).where(
+        func.lower(User.username) == {username}
+    )
+    user = db.first_or_404(query)
+    posts = [
+        {'author': user, 'body': 'Test post #1'},
+        {'author': user, 'body': 'Test post #2'}
+    ]
+    return render_template('user.html', user=user, posts=posts)
+
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.about_me.data = current_user.about_me
+    return render_template('edit_profile.html', title='Edit Profile',
+                           form=form)
