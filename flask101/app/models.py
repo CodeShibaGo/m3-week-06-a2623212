@@ -15,6 +15,12 @@ class User(UserMixin, db.Model):
     username = db.Column('username', db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column('password', db.String(256))
+    about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
+    last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(
+        default=lambda: datetime.now(timezone.utc))
+
+    posts: so.WriteOnlyMapped['Post'] = so.relationship(
+        back_populates='author')
 
     def __init__(self, username, email):
         self.username = username
@@ -30,15 +36,10 @@ class User(UserMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
 
-    about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
-    last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(
-        default=lambda: datetime.now(timezone.utc))
-
 
 @login.user_loader
 def load_user(id):
-    sql_get_id = text(f"SELECT * FROM user WHERE id = {id}")
-    return db.session.execute(sql_get_id)
+    return db.session.get(User, int(id))
 
 
 class Post(db.Model):

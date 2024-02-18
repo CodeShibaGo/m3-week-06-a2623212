@@ -10,8 +10,6 @@ from datetime import datetime, timezone
 
 @app.before_request
 def before_request():
-    print(current_user)
-    print(current_user.is_authenticated)
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
@@ -46,6 +44,7 @@ def login():
         ))
         if user is None or not user.check_password(form.password.data):
             flash('Incorrect username or password')
+            print('Incorrect username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
